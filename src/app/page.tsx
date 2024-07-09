@@ -19,33 +19,31 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import Link from "next/link";
 import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import { MenuIcon, UserIcon, ShoppingCartIcon } from "@/components/theme/icons";
-import { products } from "@/core/data/products";
+  MenuIcon,
+  UserIcon,
+  ShoppingCartIcon,
+  ExternallinkIcon,
+} from "@/components/theme/icons";
+import { initialProducts } from "@/core/data/products";
 import { useLoaderStore } from "../core/stores/useLoaderStore";
-import Loader from "@/components/theme/LoaderTicker";
 import { fakeLoader } from "@/core/lib/utils";
 import { useRouter } from "next/navigation";
-import { Link1Icon } from "@radix-ui/react-icons";
-import Succeschart from "@/components/charts/Linechart";
-import ToggleTheme from "@/components/theme/ToggleTheme";
 import { ProductDetailsDialog } from "@/components/InfoDialog";
+import Succeschart from "@/components/charts/Linechart";
 import ProductImgSkeleton from "@/components/ui/ProductImgSkeleton";
 import { Skeleton } from "@/components/ui/SkeletonLoader";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
+  PaginationPrevious,
   PaginationLink,
   PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
+import { TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import Link from "next/link";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export default function Component() {
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +91,7 @@ export default function Component() {
   };
 
   const filteredProducts = useMemo(() => {
-    return products
+    return initialProducts
       .filter((product) => {
         if (
           selectedFilters.category.length > 0 &&
@@ -151,23 +149,6 @@ export default function Component() {
     loadData();
   }, [loadData]);
 
-  const handleSliderChange = (value) => {
-    setDuration(value[0]);
-    setIsLoading(true);
-    reloadData();
-  };
-
-  const reloadData = () => {
-    setIsLoading(true);
-    fakeLoader({ duration: duration }).then(() => {
-      setIsLoading(false);
-    });
-  };
-
-  useEffect(() => {
-    reloadData();
-  }, []);
-
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedFilters, sort, search]);
@@ -178,35 +159,12 @@ export default function Component() {
         <div className="flex items-center space-x-4">
           <MenuIcon className="w-6 h-6" />
           <h1 className="text-xl font-bold">Web Scraper Tool</h1>
-          <div className="fixed bottom-2 right-2 z-50">
-            <ToggleTheme />
-          </div>
         </div>
-        <div className="flex flex-col space-x-4">
-          <div>
-            <span>Loading Duration: {duration}ms</span>
-            <input
-              type="range"
-              min={1000}
-              max={3000}
-              step={100}
-              value={duration}
-              onChange={(e) => handleSliderChange([parseInt(e.target.value)])}
-            />
-          </div>
-          <Loader duration={duration} />
-        </div>
-        <button
-          onClick={reloadData}
-          className="bg-gray-700 rounded-md px-3 py-2 text-white"
-        >
-          Reload
-        </button>
         <div className="flex items-center space-x-4">
           <Input
             type="text"
             placeholder="Search products..."
-            className="bg-gray-700 rounded-md px-3 py-2 text-white"
+            className="dark:bg-gray-700 border-zinc-500 !border rounded-md px-3 py-2 text-white"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -322,10 +280,7 @@ export default function Component() {
                 </>
               ) : (
                 paginatedProducts.map((product) => (
-                  <TableRow
-                    key={product.id}
-                    onClick={() => setOpenProductId(product.id)}
-                  >
+                  <TableRow key={product.id}>
                     <TableCell>
                       <Link
                         href="#"
@@ -334,16 +289,14 @@ export default function Component() {
                       >
                         <ProductImgSkeleton />
                         <span>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span>{product.name}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{product.description}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span>{product.name}</span>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="center">
+                              <p>{product.description}</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </span>
                       </Link>
                     </TableCell>
@@ -364,7 +317,7 @@ export default function Component() {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <span className="text-underline">{product.store}</span>{" "}
-                        <Link1Icon />
+                        <ExternallinkIcon />
                       </div>
                     </TableCell>
                     <TableCell>

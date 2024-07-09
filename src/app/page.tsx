@@ -78,29 +78,38 @@ export default function Component() {
   }, [selectedFilters, sort, search])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
 
-  const [loaderDuration, setLoaderDuration] = useState<number[]>([2000])
+  const [loaderDuration, setLoaderDuration] = useState(2000)
+
   useEffect(() => {
-    fakeLoader({duration: loaderDuration[0]}).then(() => setIsLoading(false))
+    fakeLoader({duration: loaderDuration}).then(() => {
+      setIsLoading(false)
+    })
   }, [loaderDuration])
 
   const handleSliderChange = (value: number[]) => {
-    setLoaderDuration(value)
-    setIsLoading(true)
+    localStorage.setItem('sliderValue', JSON.stringify(value));
+    setLoaderDuration(value);
+    setIsLoading(true);
     fakeLoader({duration: value[0]}).then(() => {
-      setIsLoading(false)
-    })
+      setIsLoading(false);
+    });
   }
 
+
   useEffect(() => {
-    fakeLoader({duration: loaderDuration[0]}).then(() => {
-      setIsLoading(false)
-    })
-  }, [])
+    const storedValue = JSON.parse(localStorage.getItem('sliderValue') || '[1000]');
+    setLoaderDuration(storedValue);
+    setIsLoading(true);
+    fakeLoader({duration: storedValue[0]}).then(() => {
+      setIsLoading(false);
+    });
+  }, []);
   function allowTweakFakeLoaderDuration() {
     if (isLoading) {
       return
@@ -110,8 +119,9 @@ export default function Component() {
       setIsLoading(false)
     })
   }
+
   return (
-    <div className="min-h-screen bg-[red] text-white">
+    <div className="min-h-screen bg-[#1a1a1a] text-white">
       <header className="flex items-center justify-between p-4 border-b border-gray-600">
         <div className="flex items-center space-x-4">
           <MenuIcon className="w-6 h-6" />
@@ -119,13 +129,8 @@ export default function Component() {
         </div>
         <div className="flex items-center space-x-4">
     <span>Loading Duration: {loaderDuration[0]}ms</span>
-    <Slider
-      value={loaderDuration}
-      onValueChange={handleSliderChange}
-      max={5000}
-      step={100}
-      className="w-[200px]"
-    />
+
+<input type='range' min={1000} max={3000} step={100} value={loaderDuration[0]} onChange={(e) => setLoaderDuration([parseInt(e.target.value)])} />
   </div><Button onClick={allowTweakFakeLoaderDuration} disabled={isLoading}>
   Refresh with New Duration
 </Button>
@@ -271,7 +276,7 @@ export default function Component() {
             <TableBody>
               {isLoading ? (
                 <>
-                  {[...Array(itemsPerPage)].map((_, index) => (
+                  {[...Array(6)]?.map((_, index) => (
                     <TableRow key={index}>
                       <TableCell colSpan={6}>
                         <Skeleton className="h-4 w-full" />
@@ -317,7 +322,7 @@ export default function Component() {
             </TableBody>
           </Table>
           <div className="mt-8 flex justify-center">
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+            {/* <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} /> */}
           </div>
           <div className="mt-8">
             <h2 className="text-lg font-bold mb-4">Popularity Metrics</h2>
@@ -367,6 +372,7 @@ function LinechartChart(props) {
     </div>
   )
 }
+
 
 
 function BarchartChart(props) {

@@ -1,5 +1,7 @@
 {
-  "name": "robin-ui",
+  "name": "scraper-ui-mvp-with-charts",
+  "author": "Remco Stoeten",
+  "repository": "https://github.com/remcostoeten/scraper-ui-mvp-with-charts",
   "version": "0.1.0",
   "private": true,
   "scripts": {

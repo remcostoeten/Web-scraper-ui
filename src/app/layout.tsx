@@ -3,6 +3,7 @@ import "../styles/app.css";
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import siteConfig from "@/core/data/site-config";
+import Providers from "@/core/providers";
 
 const inter = Roboto_Condensed({
   weight: ["400", "700"],
@@ -22,8 +23,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-[#09090b]`}>{children}</body>
-      <Toaster invert />
+      <body className={`${inter.className}  bgafter`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

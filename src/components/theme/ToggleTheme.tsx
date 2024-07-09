@@ -15,17 +15,15 @@ export default function ToggleTheme() {
   const handleToggle = () => {
     if (!htmlElement) return; // Ensure htmlElement is not null
 
-    if (htmlElement.classList.contains("dark")) {
-      htmlElement.classList.remove("dark");
-      htmlElement.classList.add("light");
-      toast("Theme changed to light mode");
-    } else {
-      htmlElement.classList.remove("light");
-      htmlElement.classList.add("dark");
-      toast("Theme changed to dark mode");
-    }
-  };
+    const isDarkMode = htmlElement.classList.contains("dark");
+    const newMode = isDarkMode ? "light" : "dark";
 
+    htmlElement.classList.remove(isDarkMode ? "dark" : "light");
+    htmlElement.classList.add(newMode, "transition-all");
+
+    const message = `Theme changed to ${newMode} mode`;
+    toast(message);
+  };
   return (
     <Button size="icon" onClick={handleToggle}>
       {htmlElement?.classList.contains("dark") ? <SunIcon /> : <MoonIcon />}

@@ -1,113 +1,243 @@
-import Image from "next/image";
+/**
+ * v0 by Vercel.
+ * @see https://v0.dev/t/kuWK05QbFzN
+ * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+ */
+"use client"
 
-export default function Home() {
+import { useState, useMemo } from "react"
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/ui/chart"
+import { Pie, PieChart, CartesianGrid, XAxis, Bar, BarChart } from "recharts"
+
+export default function Component() {
+  const [threshold, setThreshold] = useState(60)
+  const [showThreshold, setShowThreshold] = useState(true)
+  const deals = [
+    {
+      id: 1,
+      title: "Apple MacBook Pro 16-inch",
+      source: "Amazon",
+      discount: 25,
+      price: 2499.99,
+      originalPrice: 2999.99,
+    },
+    {
+      id: 2,
+      title: "Sony WH-1000XM4 Headphones",
+      source: "Walmart",
+      discount: 30,
+      price: 278.0,
+      originalPrice: 349.99,
+    },
+    {
+      id: 3,
+      title: "Samsung Galaxy S22 Ultra",
+      source: "MediaMarkt",
+      discount: 15,
+      price: 899.99,
+      originalPrice: 1099.99,
+    },
+    {
+      id: 4,
+      title: "Dyson V15 Detect Vacuum Cleaner",
+      source: "Amazon",
+      discount: 20,
+      price: 599.99,
+      originalPrice: 749.99,
+    },
+    {
+      id: 5,
+      title: "Bose Noise Cancelling Headphones 700",
+      source: "Walmart",
+      discount: 25,
+      price: 379.0,
+      originalPrice: 499.99,
+    },
+    {
+      id: 6,
+      title: "Nintendo Switch OLED Model",
+      source: "MediaMarkt",
+      discount: 10,
+      price: 349.99,
+      originalPrice: 399.99,
+    },
+  ]
+  const filteredDeals = deals.filter((deal) => deal.discount >= threshold)
+  const dealsBySource = useMemo(() => {
+    return deals.reduce((acc, deal) => {
+      if (!acc[deal.source]) {
+        acc[deal.source] = { deals: [], totalDiscount: 0 }
+      }
+      acc[deal.source].deals.push(deal)
+      acc[deal.source].totalDiscount += deal.discount
+      return acc
+    }, {})
+  }, [deals])
+  const chartData = useMemo(() => {
+    return Object.entries(dealsBySource).map(([source, data]) => ({
+      label: source,
+      value: data.totalDiscount / (data.deals.length * 100),
+    }))
+  }, [dealsBySource])
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col gap-8 p-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Deal Finder</h1>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">Threshold:</span>
+            <Slider value={[threshold]} onValueChange={setThreshold} max={100} step={1} className="w-[200px]" />
+            <span className="font-medium">{threshold}%</span>
+          </div>
+          <Switch
+            checked={showThreshold}
+            onCheckedChange={setShowThreshold}
+            className="[&>div]:bg-primary [&>div]:border-primary"
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            <span className="sr-only">Show Threshold</span>
+          </Switch>
         </div>
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      {showThreshold && (
+        <div className="bg-background p-6 rounded-lg shadow">
+          <h2 className="text-lg font-bold mb-4">Deals above {threshold}% discount</h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {filteredDeals.map((deal) => (
+              <li key={deal.id} className="bg-card p-4 rounded-lg shadow-lg transition-transform hover:-translate-y-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-bold">{deal.title}</h3>
+                  <Badge variant="outline" className="bg-primary text-primary-foreground">
+                    {deal.discount}% off
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-muted-foreground">From {deal.source}</p>
+                    <p className="font-medium">${deal.price}</p>
+                    <p className="text-muted-foreground line-through">${deal.originalPrice}</p>
+                  </div>
+                  <Button variant="outline">View Deal</Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div className="bg-background p-6 rounded-lg shadow">
+        <h2 className="text-lg font-bold mb-4">Deal Trends</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Deal Distribution by Source</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PiechartcustomChart className="w-full aspect-square" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Average Discount by Source</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BarchartChart className="w-full aspect-[4/3]" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
+    </div>
+  )
+}
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+function BarchartChart(props) {
+  return (
+    <div {...props}>
+      <ChartContainer
+        config={{
+          desktop: {
+            label: "Desktop",
+            color: "hsl(var(--chart-1))",
+          },
+        }}
+        className="min-h-[300px]"
+      >
+        <BarChart
+          accessibilityLayer
+          data={[
+            { month: "January", desktop: 186 },
+            { month: "February", desktop: 305 },
+            { month: "March", desktop: 237 },
+            { month: "April", desktop: 73 },
+            { month: "May", desktop: 209 },
+            { month: "June", desktop: 214 },
+          ]}
         >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  )
+}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+function PiechartcustomChart(props) {
+  return (
+    <div {...props}>
+      <ChartContainer
+        config={{
+          visitors: {
+            label: "Visitors",
+          },
+          chrome: {
+            label: "Chrome",
+            color: "hsl(var(--chart-1))",
+          },
+          safari: {
+            label: "Safari",
+            color: "hsl(var(--chart-2))",
+          },
+          firefox: {
+            label: "Firefox",
+            color: "hsl(var(--chart-3))",
+          },
+          edge: {
+            label: "Edge",
+            color: "hsl(var(--chart-4))",
+          },
+          other: {
+            label: "Other",
+            color: "hsl(var(--chart-5))",
+          },
+        }}
+      >
+        <PieChart>
+          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+          <Pie
+            data={[
+              { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
+              { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
+              { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
+              { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
+              { browser: "other", visitors: 90, fill: "var(--color-other)" },
+            ]}
+            dataKey="visitors"
+            nameKey="browser"
+          />
+        </PieChart>
+      </ChartContainer>
+    </div>
+  )
 }

@@ -15,12 +15,18 @@ import Loader from "@/components/theme/LoaderTicker"
 import { fakeLoader } from "@/core/lib/utils"
 import { useRouter } from "next/navigation"
 import { Link1Icon } from "@radix-ui/react-icons"
-import { Pagination } from "@/components/ui/pagination"
 import Succeschart from "@/components/charts/Linechart"
 import ToggleTheme from "@/components/theme/ToggleTheme"
 import { ProductDetailsDialog } from "@/components/InfoDialog"
 import ProductImgSkeleton from "@/components/ui/ProductImgSkeleton"
 import { Skeleton } from "@/components/ui/SkeletonLoader"
+import {
+    Pagination,
+    PaginationContent, PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious
+} from "@/components/ui/pagination"
 
 export default function Component() {
     const [isLoading, setIsLoading] = useState(true)
@@ -36,7 +42,6 @@ export default function Component() {
     const itemsPerPage = 10
     const router = useRouter();
     const [openProductId, setOpenProductId] = useState(null);
-
 
     function isDiscountAbove50(oldPrice, newPrice) {
         const discountPercentage = ((oldPrice - newPrice) / oldPrice) * 100;
@@ -96,6 +101,11 @@ export default function Component() {
             })
     }, [selectedFilters, sort, search])
 
+    const paginatedProducts = filteredProducts.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
 
     const handlePageChange = (page) => {
@@ -113,10 +123,10 @@ export default function Component() {
         loadData()
     }, [loadData])
 
-    const handleSliderChange = (value: number[]) => {
+    const handleSliderChange = (value) => {
         setDuration(value[0]);
         setIsLoading(true);
-        reloadData(); // Call the reloadData function to update loading based on the new duration
+        reloadData();
     }
 
     const reloadData = () => {
@@ -129,6 +139,10 @@ export default function Component() {
     useEffect(() => {
         reloadData()
     }, [])
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [selectedFilters, sort, search])
 
     return (
         <div className="min-h-screen ">
@@ -257,7 +271,7 @@ export default function Component() {
                                     ))}
                                 </>
                             ) : (
-                                filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
+                                paginatedProducts.map((product) => (
                                     <TableRow
                                         key={product.id}
                                         onClick={() => setOpenProductId(product.id)}
@@ -308,7 +322,32 @@ export default function Component() {
                         </TableBody>
                     </Table>
                     <div className="mt-8 flex justify-center">
-                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    />
+                                </PaginationItem>
+                                {[...Array(totalPages)].map((_, index) => (
+                                    <PaginationItem key={index}>
+                                        <PaginationLink
+                                            onClick={() => handlePageChange(index + 1)}
+                                            isActive={currentPage === index + 1}
+                                        >
+                                            {index + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
                     </div>
                     <div className="mt-8">
                         <h2 className="text-lg font-bold mb-4">Popularity Metrics</h2>

@@ -8,12 +8,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import Link from "next/link"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import { CartesianGrid, XAxis, Bar, BarChart, Line, LineChart } from "recharts"
-import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/ui/chart"
 import { MenuIcon, UserIcon, ShoppingCartIcon } from "@/components/theme/icons"
-import { LineData } from "@/core/data/line-chart-data"
 import { products } from "@/core/data/products"
-import { Skeleton } from "@/components/ui/SkeletonLoader"
 import { useLoaderStore } from '../core/stores/useLoaderStore'
 import Loader from "@/components/theme/LoaderTicker"
 import { fakeLoader } from "@/core/lib/utils"
@@ -22,7 +18,9 @@ import { Link1Icon } from "@radix-ui/react-icons"
 import { Pagination } from "@/components/ui/pagination"
 import Succeschart from "@/components/charts/Linechart"
 import ToggleTheme from "@/components/theme/ToggleTheme"
-import { Badge } from "@/components/ui/badge"
+import { ProductDetailsDialog } from "@/components/InfoDialog"
+import ProductImgSkeleton from "@/components/ui/ProductImgSkeleton"
+import { Skeleton } from "@/components/ui/SkeletonLoader"
 
 export default function Component() {
     const [isLoading, setIsLoading] = useState(true)
@@ -37,11 +35,14 @@ export default function Component() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 10
     const router = useRouter();
+    const [openProductId, setOpenProductId] = useState(null);
 
-    function isDiscountAbove50(discount) { // Add discount parameter
-        return discount > 50 ? (
+
+    function isDiscountAbove50(oldPrice, newPrice) {
+        const discountPercentage = ((oldPrice - newPrice) / oldPrice) * 100;
+        return discountPercentage > 50 ? (
             <span className="pulse text-3xl text-green-600">!!!!</span>
-        ) : null; // Check discount and return conditionally
+        ) : null;
     }
 
     const handleFilterChange = (type, value) => {
@@ -131,13 +132,11 @@ export default function Component() {
 
     return (
         <div className="min-h-screen ">
-            <header className="flex items-center justify-between p-4 border-b dark:border-white  border-gray-600">
+            <header className="flex items-center justify-between p-4 border-b dark:border-white border-gray-600">
                 <div className="flex items-center space-x-4">
                     <MenuIcon className="w-6 h-6" />
                     <h1 className="text-xl font-bold">Web Scraper Tool</h1>
-
-                    <div className="fixed bottom-2 right-2 z-50"><ToggleTheme />
-                    </div>
+                    <div className="fixed bottom-2 right-2 z-50"><ToggleTheme /></div>
                 </div>
                 <div className="flex flex-col space-x-4">
                     <div>
@@ -154,7 +153,6 @@ export default function Component() {
                     <Loader duration={duration} />
                 </div>
                 <button onClick={reloadData} className="bg-gray-700 rounded-md px-3 py-2 text-white">Reload</button>
-
                 <div className="flex items-center space-x-4">
                     <Input
                         type="text"
@@ -170,7 +168,8 @@ export default function Component() {
             <main className="flex">
                 <aside className={`w-64 p-4 border-r border-gray-600 ${showFilters ? "" : "hidden"}`}>
                     <div className="flex items-center justify-between mb-4">
-                        <div className="flex flex-col gap-1"><h2 className="text-lg font-bold">Filters</h2>
+                        <div className="flex flex-col gap-1">
+                            <h2 className="text-lg font-bold">Filters</h2>
                             <div className="flex items-center space-x-2">
                                 <Button
                                     variant="outline"
@@ -243,6 +242,7 @@ export default function Component() {
                                 <TableHead>Discount</TableHead>
                                 <TableHead>Store</TableHead>
                                 <TableHead>More than 50%</TableHead>
+                                <TableHead>More info</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -258,7 +258,10 @@ export default function Component() {
                                 </>
                             ) : (
                                 filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
-                                    <TableRow key={product.id}>
+                                    <TableRow
+                                        key={product.id}
+                                        onClick={() => setOpenProductId(product.id)}
+                                    >
                                         <TableCell>
                                             <Link href="#" className="flex items-center space-x-2" prefetch={false}>
                                                 <ProductImgSkeleton />
@@ -279,11 +282,27 @@ export default function Component() {
                                         <TableCell>${product.price.toFixed(2)}</TableCell>
                                         <TableCell>
                                             <span className="line-through text-gray-500">${product.oldPrice}</span>
-                                            <span className="ml-2">{product.discount.toFixed(2)}%</span>
+                                            <span className="ml-2">
+                                                {(((product.oldPrice - product.price) / product.oldPrice) * 100).toFixed(2)}%
+                                            </span>
                                         </TableCell>
-                                        <TableCell><div className="flex items-center gap-1"><span className="text-underline">{product.store}</span> <Link1Icon /></div>
+                                        <TableCell>
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-underline">{product.store}</span> <Link1Icon />
+                                            </div>
                                         </TableCell>
-                                        <TableCell>{isDiscountAbove50(product.price)}</TableCell>                                    </TableRow>
+                                        <TableCell>{isDiscountAbove50(product.oldPrice, product.price)}</TableCell>
+                                        <TableCell>
+                                            <Button onClick={() => setOpenProductId(product.id)} size='icon'>
+                                                <span>?</span>
+                                            </Button>
+                                        </TableCell>
+                                        <ProductDetailsDialog
+                                            product={product}
+                                            isOpen={openProductId === product.id}
+                                            onOpenChange={() => setOpenProductId(null)}
+                                        />
+                                    </TableRow>
                                 ))
                             )}
                         </TableBody>
@@ -300,93 +319,5 @@ export default function Component() {
                 </div>
             </main>
         </div>
-    )
-}
-
-
-
-
-
-function LinechartChart(props) {
-    return (
-        <div {...props}>
-            <ChartContainer
-                config={{
-                    desktop: {
-                        label: "Desktop",
-                        color: "hsl(var(--chart-1))",
-                    },
-                }}
-            >
-                <LineChart
-                    accessibilityLayer
-                    data={LineData}
-                    margin={{
-                        left: 12,
-                        right: 12,
-                    }}
-                >
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        tickFormatter={(value) => value.slice(0, 3)}
-                    />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                    <Line dataKey="d" type="natural" stroke="var(--color-desktop)" strokeWidth={2} dot={false} />
-                </LineChart>
-            </ChartContainer>
-        </div>
-    )
-}
-
-
-function BarchartChart(props) {
-    return (
-        <div {...props}>
-            <ChartContainer
-                config={{
-                    desktop: {
-                        label: "Desktop",
-                        color: "hsl(var(--chart-1))",
-                    },
-                }}
-                className="min-h-[300px]"
-            >
-                <BarChart
-                    accessibilityLayer
-                    data={[
-                        { month: "January", desktop: 186 },
-                        { month: "February", desktop: 305 },
-                        { month: "March", desktop: 237 },
-                        { month: "April", desktop: 73 },
-                        { month: "May", desktop: 209 },
-                        { month: "June", desktop: 214 },
-                    ]}
-                >
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                        tickFormatter={(value) => value.slice(0, 3)}
-                    />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                    <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
-                </BarChart>
-            </ChartContainer>
-        </div>
-    )
-}
-
-
-
-
-function ProductImgSkeleton() {
-    return (
-        <div className="w-10 h-10 bg-gray-200 rounded- animate-pulse"></div>
     )
 }

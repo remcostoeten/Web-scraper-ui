@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface LoaderStore {
-  duration: number
-  setDuration: (duration: number) => void
+  duration: number;
+  setDuration: (duration: number) => void;
 }
 
 export const useLoaderStore = create<LoaderStore>()(
@@ -15,7 +15,7 @@ export const useLoaderStore = create<LoaderStore>()(
       setDuration: (duration) => set({ duration }),
     }),
     {
-      name: 'loader-storage',
-    }
-  )
-)
+      name: "loader-storage",
+    },
+  ),
+);

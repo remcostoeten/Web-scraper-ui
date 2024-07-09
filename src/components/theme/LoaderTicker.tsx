@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { fakeLoader } from "@/core/lib/utils";
 
@@ -29,7 +29,13 @@ const Loader = ({ duration }) => {
 
   return (
     <div>
-      <div style={{ width: `${(1 - timeLeft / duration) * 100}%`, height: "10px", background: "blue" }}></div>
+      <div
+        style={{
+          width: `${(1 - timeLeft / duration) * 100}%`,
+          height: "10px",
+          background: "blue",
+        }}
+      ></div>
       <div>Time left: {timeLeft}ms</div>
     </div>
   );

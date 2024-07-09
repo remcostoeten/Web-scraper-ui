@@ -1,4 +1,3 @@
-
 function MenuIcon(props) {
   return (
     <svg
@@ -17,9 +16,8 @@ function MenuIcon(props) {
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
-  )
+  );
 }
-
 
 function ShoppingCartIcon(props) {
   return (
@@ -39,9 +37,8 @@ function ShoppingCartIcon(props) {
       <circle cx="19" cy="21" r="1" />
       <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
     </svg>
-  )
+  );
 }
-
 
 function UserIcon(props) {
   return (
@@ -60,6 +57,6 @@ function UserIcon(props) {
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
-  )
+  );
 }
-export {UserIcon, ShoppingCartIcon, MenuIcon }
+export { UserIcon, ShoppingCartIcon, MenuIcon };

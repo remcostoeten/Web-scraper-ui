@@ -5,25 +5,25 @@ import type { Metadata } from "next";
 import siteConfig from "@/core/data/site-config";
 
 const inter = Roboto_Condensed({
-    weight: ['400', '700'],
-    subsets: ['latin'],
-    display: 'swap',
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-    title: siteConfig.title,
-    description: siteConfig.description,
+  title: siteConfig.title,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en" className="dark">
-            <body className={`${inter.className} bg-[#09090b]`}>{children}</body>
-            <Toaster invert />
-        </html>
-    );
+  return (
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-[#09090b]`}>{children}</body>
+      <Toaster invert />
+    </html>
+  );
 }

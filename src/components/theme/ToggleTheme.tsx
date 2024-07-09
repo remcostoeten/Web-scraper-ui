@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { MoonIcon, SunIcon } from "lucide-react";
-import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 export default function ToggleTheme() {
   const [htmlElement, setHtmlElement] = useState<HTMLDivElement | null>(null);
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -14,8 +14,12 @@ import { ChartTooltipContent, ChartTooltip, ChartContainer } from "@/components/
 import { MenuIcon, UserIcon, ShoppingCartIcon } from "@/components/theme/icons"
 import { LineData } from "@/core/data/line-chart-data"
 import { products } from "@/core/data/products"
+import { Skeleton } from "@/components/ui/SkeletonLoader"
+import { fakeLoader } from "@/core/lib/utils"
+import { Slider } from "@/components/ui/slider"
 
 export default function Component() {
+  const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [selectedFilters, setSelectedFilters] = useState({
     category: [],
@@ -78,14 +82,54 @@ export default function Component() {
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
+
+  const [loaderDuration, setLoaderDuration] = useState<number[]>([2000])
+  useEffect(() => {
+    fakeLoader({duration: loaderDuration[0]}).then(() => setIsLoading(false))
+  }, [loaderDuration])
+
+  const handleSliderChange = (value: number[]) => {
+    setLoaderDuration(value)
+    setIsLoading(true)
+    fakeLoader({duration: value[0]}).then(() => {
+      setIsLoading(false)
+    })
+  }
+
+  useEffect(() => {
+    fakeLoader({duration: loaderDuration[0]}).then(() => {
+      setIsLoading(false)
+    })
+  }, [])
+  function allowTweakFakeLoaderDuration() {
+    if (isLoading) {
+      return
+    }
+    setIsLoading(true)
+    fakeLoader({duration: loaderDuration[0]}).then(() => {
+      setIsLoading(false)
+    })
+  }
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white">
+    <div className="min-h-screen bg-[red] text-white">
       <header className="flex items-center justify-between p-4 border-b border-gray-600">
         <div className="flex items-center space-x-4">
           <MenuIcon className="w-6 h-6" />
           <h1 className="text-xl font-bold">Web Scraper Tool</h1>
         </div>
         <div className="flex items-center space-x-4">
+    <span>Loading Duration: {loaderDuration[0]}ms</span>
+    <Slider
+      value={loaderDuration}
+      onValueChange={handleSliderChange}
+      max={5000}
+      step={100}
+      className="w-[200px]"
+    />
+  </div><Button onClick={allowTweakFakeLoaderDuration} disabled={isLoading}>
+  Refresh with New Duration
+</Button>
+            <div className="flex items-center space-x-4">
           <Input
             type="text"
             placeholder="Search products..."
@@ -225,39 +269,51 @@ export default function Component() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    <Link href="#" className="flex items-center space-x-2" prefetch={false}>
-                      <img src="/placeholder.svg" alt="Product" className="w-12 h-12" />
-                      <span>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span>{product.name}</span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{product.description}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </span>
-                    </Link>
-                  </TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>
-                    <div className="inline-block rounded-full bg-green-500 px-2 py-1 text-white text-xs">
-                      {product.discount}% off
-                    </div>
-                  </TableCell>
-                  <TableCell>${product.price}</TableCell>
-                  <TableCell>
-                    <span className="line-through text-gray-500">${product.oldPrice}</span>
-                    <span className="ml-2 text-green-500">-${product.oldPrice - product.price}</span>
-                  </TableCell>
-                  <TableCell>{product.store}</TableCell>
-                </TableRow>
-              ))}
+              {isLoading ? (
+                <>
+                  {[...Array(itemsPerPage)].map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell colSpan={6}>
+                        <Skeleton className="h-4 w-full" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              ) : (
+                filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <Link href="#" className="flex items-center space-x-2" prefetch={false}>
+                        <img src="/placeholder.svg" alt="Product" className="w-12 h-12" />
+                        <span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span>{product.name}</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{product.description}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </span>
+                      </Link>
+                    </TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>
+                      <div className="inline-block rounded-full bg-green-500 px-2 py-1 text-white text-xs">
+                        {product.discount}% off
+                      </div>
+                    </TableCell>
+                    <TableCell>${product.price}</TableCell>
+                    <TableCell>
+                      <span className="line-through text-gray-500">${product.oldPrice}</span>
+                      <span className="ml-2 text-green-500">-${product.oldPrice - product.price}</span>
+                    </TableCell>
+                    <TableCell>{product.store}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
           <div className="mt-8 flex justify-center">

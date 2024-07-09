@@ -22,8 +22,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="dark">
-            <body className={`${inter.className} bg-[#202128]`}>{children}</body>
-            <Toaster />
+            <body className={`${inter.className} bg-[#09090b]`}>{children}</body>
+            <Toaster invert />
         </html>
     );
 }

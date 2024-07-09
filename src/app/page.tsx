@@ -326,8 +326,11 @@ export default function Component() {
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
+                                        onClick={() => {
+                                            if (currentPage !== 1) {
+                                                handlePageChange(currentPage - 1);
+                                            }
+                                        }}
                                     />
                                 </PaginationItem>
                                 {[...Array(totalPages)].map((_, index) => (
@@ -342,8 +345,11 @@ export default function Component() {
                                 ))}
                                 <PaginationItem>
                                     <PaginationNext
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
+                                        onClick={() => {
+                                            if (currentPage !== totalPages) {
+                                                handlePageChange(currentPage + 1);
+                                            }
+                                        }}
                                     />
                                 </PaginationItem>
                             </PaginationContent>

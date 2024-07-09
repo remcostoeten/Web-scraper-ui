@@ -41,9 +41,6 @@ dependencies:
   next:
     specifier: 14.2.4
     version: 14.2.4(react-dom@18.3.1)(react@18.3.1)
-  pill:
-    specifier: ^1.4.6
-    version: 1.4.6
   react:
     specifier: ^18
     version: 18.3.1
@@ -2956,10 +2953,6 @@ packages:
   /pify@2.3.0:
     resolution: {integrity: sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==}
     engines: {node: '>=0.10.0'}
-
-  /pill@1.4.6:
-    resolution: {integrity: sha512-BeND7QcvEhfSUneTadcsx+x3bjIt64MJm/LAbfVQTR9cqvWt3Wrop3PODhswZatZwJyKY4n9WBg6WStAfKrbCQ==}
-    dev: false
 
   /pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}

@@ -23,7 +23,6 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.406.0",
     "next": "14.2.4",
-    "pill": "^1.4.6",
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^2.12.7",

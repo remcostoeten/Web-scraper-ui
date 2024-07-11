@@ -4,6 +4,6 @@ A simple repo to test new shadcn(v0) charts capabillity and do some sqlite perfo
 
 No best practices uses here. Litterly a quick MVP thus everything is trown into the page.tsx and nothing is seperated into functions how you want it.
 
-Deployed version can be found here [https://scraper-ui.remcostoeten.com](https://scraper-ui.remcostoeten.com)
+Deployed version can be found here [https://scraper-ui.remcostoeten.com](https://web-scraper.remcostoeten.com)
 
 xxx
